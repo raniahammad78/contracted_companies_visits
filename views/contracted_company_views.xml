@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Contracted Company list View -->
+    <record id="view_contracted_company_list" model="ir.ui.view">
+        <field name="name">contracted.company.list</field>
+        <field name="model">contracted.company</field>
+        <field name="arch" type="xml">
+            <list string="Contracted Companies">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="contact_person"/>
+                <field name="phone"/>
+                <field name="visits_per_month"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+    <!-- Contracted Company Form View -->
+    <record id="view_contracted_company_form" model="ir.ui.view">
+        <field name="name">contracted.company.form</field>
+        <field name="model">contracted.company</field>
+        <field name="arch" type="xml">
+            <form string="Contracted Company">
+                <header>
+                    <button name="action_schedule_visit" string="Schedule Visit"
+                            type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_visits"
+                                icon="fa-calendar-check-o">
+                            <field string="Total Visits" name="visit_count" widget="statinfo"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_visits" icon="fa-calendar">
+                            <field string="This Year" name="current_year_visits" widget="statinfo"/>
+                        </button>
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"/>
+                        </button>
+                    </div>
+
+                    <group>
+                        <group string="Company Information">
+                            <field name="name" placeholder="Company Name"/>
+                            <field name="code" placeholder="Company Code (e.g., COMP001)"/>
+                            <field name="contact_person"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                        </group>
+                        <group string="Contract Details">
+                            <field name="contract_start_date"/>
+                            <field name="contract_end_date"/>
+                            <field name="visits_per_month"/>
+                            <field name="expected_yearly_visits" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Address">
+                        <field name="address" nolabel="1"/>
+                    </group>
+
+                    <group string="Visit Statistics">
+                        <group>
+                            <field name="last_visit_date" readonly="1"/>
+                            <field name="next_scheduled_visit"/>
+                        </group>
+                        <group>
+                            <field name="folder_path" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Contracted Company Search View -->
+    <record id="view_contracted_company_search" model="ir.ui.view">
+        <field name="name">contracted.company.search</field>
+        <field name="model">contracted.company</field>
+        <field name="arch" type="xml">
+            <search string="Contracted Companies">
+                <field name="name" string="Company Name"/>
+                <field name="code" string="Company Code"/>
+                <field name="contact_person"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter string="Contract Expired" name="contract_expired"
+                        domain="[('contract_end_date','&lt;',context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Contract Active" name="contract_active"
+                        domain="[('contract_end_date','&gt;=',context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Visits per Month" name="group_visits_per_month"
+                            context="{'group_by':'visits_per_month'}"/>
+                    <filter string="Contract Start Year" name="group_contract_year"
+                            context="{'group_by':'contract_start_date:year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Contracted Company Kanban View -->
+    <record id="view_contracted_company_kanban" model="ir.ui.view">
+        <field name="name">contracted.company.kanban</field>
+        <field name="model">contracted.company</field>
+        <field name="arch" type="xml">
+            <kanban string="Contracted Companies">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="visit_count"/>
+                <field name="current_year_visits"/>
+                <field name="expected_yearly_visits"/>
+                <field name="last_visit_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <div class="o_secondary">
+                                        <field name="code"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <div class="o_kanban_card_manage_pane">
+                                    <div>Total Visits:
+                                        <field name="visit_count"/>
+                                    </div>
+                                    <div>This Year:
+                                        <field name="current_year_visits"/>
+                                        /
+                                        <field name="expected_yearly_visits"/>
+                                    </div>
+                                    <div t-if="record.last_visit_date.value">Last Visit:
+                                        <field name="last_visit_date"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <!-- Contracted Company Action -->
+    <record id="action_contracted_company" model="ir.actions.act_window">
+        <field name="name">Contracted Companies</field>
+        <field name="res_model">contracted.company</field>
+        <field name="view_mode">form,list,kanban</field>
+        <field name="view_id" ref="view_contracted_company_list"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first contracted company!
+            </p>
+            <p>
+                Manage companies that you have contracts with for regular visits.
+                The system will automatically create folders for each company and
+                organize visit reports by year.
+            </p>
+        </field>
+    </record>
+</odoo>

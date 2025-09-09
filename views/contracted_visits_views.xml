@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Company Visit list View -->
+    <record id="view_company_visit_list" model="ir.ui.view">
+        <field name="name">company.visit.list</field>
+        <field name="model">company.visit</field>
+        <field name="arch" type="xml">
+            <list string="Company Visits" decoration-success="state=='completed'"
+                  decoration-warning="state=='scheduled'" decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="visit_date"/>
+                <field name="visitor_name"/>
+                <field name="purpose"/>
+                <field name="duration_hours" sum="Total Hours"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='completed'"
+                       decoration-warning="state=='scheduled'"
+                       decoration-info="state=='in_progress'"
+                       decoration-danger="state=='cancelled'"/>
+                <field name="follow_up_required" widget="boolean_toggle"/>
+                <button name="action_generate_pdf_report" type="object"
+                        string="Generate Report" icon="fa-file-pdf-o"/>
+            </list>
+        </field>
+    </record>
+    <!-- Company Visit Form View -->
+    <record id="view_company_visit_form" model="ir.ui.view">
+        <field name="name">company.visit.form</field>
+        <field name="model">company.visit</field>
+        <field name="arch" type="xml">
+            <form string="Company Visit">
+                <header>
+                    <button name="action_schedule" string="Schedule" type="object"
+                            class="btn-primary"/>
+                    <button name="action_start_visit" string="Start Visit" type="object"
+                            class="btn-primary"/>
+                    <button name="action_complete_visit" string="Complete Visit" type="object"
+                            class="btn-success"/>
+                    <button name="action_cancel_visit" string="Cancel" type="object"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object"/>
+                    <button name="action_generate_pdf_report" string="Generate PDF Report" type="object"
+                            class="btn-info" icon="fa-file-pdf-o"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,scheduled,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_report"
+                                icon="fa-file-pdf-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">View</span>
+                                <span class="o_stat_text">Report</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <group>
+                        <group string="Visit Information">
+                            <field name="name" readonly="1"/>
+                            <field name="company_id" options="{'no_create': True}"/>
+                            <field name="visit_date"/>
+                            <field name="purpose"/>
+                            <field name="duration_hours"/>
+                        </group>
+                        <group string="Visitor Information">
+                            <field name="visitor_name"/>
+                            <field name="visitor_position"/>
+                            <field name="follow_up_required"/>
+                            <field name="follow_up_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Visit Details">
+                            <group>
+                                <group string="Findings">
+                                    <field name="findings" nolabel="1"/>
+                                </group>
+                                <group string="Issues Found">
+                                    <field name="issues_found" nolabel="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Actions Taken">
+                                    <field name="actions_taken" nolabel="1"/>
+                                </group>
+                                <group string="Recommendations">
+                                    <field name="recommendations" nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Additional Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="mimetype"/>
+                                    <field name="file_size"/>
+                                    <field name="create_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Technical Info" groups="base.group_no_one">
+                            <group>
+                                <field name="visit_year" readonly="1"/>
+                                <field name="visit_month" readonly="1"/>
+                                <field name="pdf_report_generated" readonly="1"/>
+                                <field name="report_file_path" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Company Visit Search View -->
+    <record id="view_company_visit_search" model="ir.ui.view">
+        <field name="name">company.visit.search</field>
+        <field name="model">company.visit</field>
+        <field name="arch" type="xml">
+            <search string="Company Visits">
+                <field name="name" string="Visit Reference"/>
+                <field name="company_id" string="Company"/>
+                <field name="visitor_name"/>
+                <field name="purpose"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Scheduled" name="scheduled" domain="[('state','=','scheduled')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state','=','in_progress')]"/>
+                <filter string="Completed" name="completed" domain="[('state','=','completed')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <filter string="Follow-up Required" name="follow_up_required"
+                        domain="[('follow_up_required','=',True)]"/>
+                <filter string="This Month" name="this_month"
+                        domain="[('visit_month','=',context_today().month),('visit_year','=',context_today().year)]"/>
+                <filter string="This Year" name="this_year"
+                        domain="[('visit_year','=',context_today().year)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Company" name="group_company" context="{'group_by':'company_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by':'state'}"/>
+                    <filter string="Purpose" name="group_purpose" context="{'group_by':'purpose'}"/>
+                    <filter string="Visit Date" name="group_visit_date" context="{'group_by':'visit_date:month'}"/>
+                    <filter string="Visitor" name="group_visitor" context="{'group_by':'visitor_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <!-- Company Visit Calendar View -->
+    <record id="view_company_visit_calendar" model="ir.ui.view">
+        <field name="name">company.visit.calendar</field>
+        <field name="model">company.visit</field>
+        <field name="arch" type="xml">
+            <calendar string="Company Visits" date_start="visit_date" color="company_id" mode="month">
+                <field name="company_id"/>
+                <field name="visitor_name"/>
+                <field name="purpose"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Company Visit Graph View -->
+    <record id="view_company_visit_graph" model="ir.ui.view">
+        <field name="name">company.visit.graph</field>
+        <field name="model">company.visit</field>
+        <field name="arch" type="xml">
+            <graph string="Visit Statistics" type="bar">
+                <field name="company_id" type="row"/>
+                <field name="visit_date" type="col" interval="month"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Company Visit Pivot View -->
+    <record id="view_company_visit_pivot" model="ir.ui.view">
+        <field name="name">company.visit.pivot</field>
+        <field name="model">company.visit</field>
+        <field name="arch" type="xml">
+            <pivot string="Visit Analysis">
+                <field name="company_id" type="row"/>
+                <field name="visit_date" type="col" interval="month"/>
+                <field name="duration_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <!-- Company Visit Action -->
+    <record id="action_company_visit" model="ir.actions.act_window">
+        <field name="name">Company Visits</field>
+        <field name="res_model">company.visit</field>
+        <field name="view_mode">form,list,graph,pivot</field>
+        <field name="view_id" ref="view_company_visit_list"/>
+        <field name="context">{'search_default_this_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Schedule your first company visit!
+            </p>
+            <p>
+                Track and manage visits to contracted companies. The system will
+                automatically generate PDF reports and organize them in company folders
+                by year when visits are completed.
+            </p>
+        </field>
+    </record>
+</odoo>

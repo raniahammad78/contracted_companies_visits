@@ -1,1 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_company_visits_root"
+              name="Company Visits"
+              sequence="1"/>
 
+    <!-- Companies Menu -->
+    <menuitem id="menu_contracted_companies"
+              name="Contracted Companies"
+              parent="menu_company_visits_root"
+              action="action_contracted_company"
+              sequence="1"/>
+
+        <!-- Visits Menu -->
+    <menuitem id="menu_company_visits"
+              name="Visits"
+              parent="menu_company_visits_root"
+              action="action_company_visit"
+              sequence="2"/>
+
+    <!-- Reports submenu -->
+    <menuitem id="menu_company_visits_reports"
+              name="Reports"
+              parent="menu_company_visits_root"
+              sequence="3"/>
+
+     <!-- Visit Statistics Action -->
+    <record id="action_visit_statistics" model="ir.actions.act_window">
+        <field name="name">Visit Statistics</field>
+        <field name="res_model">company.visit</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="context">{'search_default_this_year': 1}</field>
+    </record>
+
+    <!-- Visit Statistics Menu -->
+    <menuitem id="menu_visit_statistics"
+              name="Visit Statistics"
+              parent="menu_company_visits_reports"
+              action="action_visit_statistics"
+              sequence="4"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_company_visits_config"
+              name="Configuration"
+              parent="menu_company_visits_root"
+              sequence="5"/>
+</odoo>
