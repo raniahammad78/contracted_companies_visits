@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_contracted_company_user,contracted.company.user,model_contracted_company,base.group_user,1,1,1,0
+access_contracted_company_manager,contracted.company.manager,model_contracted_company,base.group_system,1,1,1,1
+access_company_visit_user,company.visit.user,model_company_visit,base.group_user,1,1,1,0
+access_company_visit_manager,company.visit.manager,model_company_visit,base.group_system,1,1,1,1
