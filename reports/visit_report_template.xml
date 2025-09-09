@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_visit_document">
+        <!-- FIXED: Using web.basic_layout instead of web.external_layout to avoid company layout issues -->
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <!-- Header with Company Info -->
+                <div class="header">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <h2>Visit Report</h2>
+                            <h4><span t-field="doc.name"/></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Information -->
+                <div class="row mt-4 mb-4">
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>Company:</strong></td>
+                                <td><span t-field="doc.company_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Company Code:</strong></td>
+                                <td><span t-field="doc.company_id.code"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Contact Person:</strong></td>
+                                <td><span t-field="doc.company_id.contact_person"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone:</strong></td>
+                                <td><span t-field="doc.company_id.phone"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>Visit Date:</strong></td>
+                                <td><span t-field="doc.visit_date" t-options='{"widget": "datetime"}'/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Visitor Name:</strong></td>
+                                <td><span t-field="doc.visitor_name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Visitor Position:</strong></td>
+                                <td><span t-field="doc.visitor_position"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duration:</strong></td>
+                                <td><span t-field="doc.duration_hours"/> hours</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Purpose and Status -->
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>Purpose:</strong></td>
+                                <td>
+                                    <span t-if="doc.purpose == 'routine'">Routine Inspection</span>
+                                    <span t-if="doc.purpose == 'maintenance'">Maintenance</span>
+                                    <span t-if="doc.purpose == 'emergency'">Emergency</span>
+                                    <span t-if="doc.purpose == 'audit'">Audit</span>
+                                    <span t-if="doc.purpose == 'training'">Training</span>
+                                    <span t-if="doc.purpose == 'meeting'">Meeting</span>
+                                    <span t-if="doc.purpose == 'other'">Other</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    <span t-if="doc.state == 'draft'" class="badge badge-secondary">Draft</span>
+                                    <span t-if="doc.state == 'scheduled'" class="badge badge-info">Scheduled</span>
+                                    <span t-if="doc.state == 'in_progress'" class="badge badge-warning">In Progress</span>
+                                    <span t-if="doc.state == 'completed'" class="badge badge-success">Completed</span>
+                                    <span t-if="doc.state == 'cancelled'" class="badge badge-danger">Cancelled</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Findings -->
+                <div t-if="doc.findings" class="row mb-3">
+                    <div class="col-12">
+                        <h5>Findings</h5>
+                        <div class="border p-3" style="background-color: #f8f9fa;">
+                            <div t-field="doc.findings"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Issues Found -->
+                <div t-if="doc.issues_found" class="row mb-3">
+                    <div class="col-12">
+                        <h5>Issues Found</h5>
+                        <div class="border p-3" style="background-color: #fff3cd;">
+                            <div t-field="doc.issues_found"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Taken -->
+                <div t-if="doc.actions_taken" class="row mb-3">
+                    <div class="col-12">
+                        <h5>Actions Taken</h5>
+                        <div class="border p-3" style="background-color: #d4edda;">
+                            <div t-field="doc.actions_taken"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div t-if="doc.recommendations" class="row mb-3">
+                    <div class="col-12">
+                        <h5>Recommendations</h5>
+                        <div class="border p-3" style="background-color: #e2e3e5;">
+                            <div t-field="doc.recommendations"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Follow-up Information -->
+                <div t-if="doc.follow_up_required" class="row mb-3">
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            <h5 class="alert-heading">Follow-up Required</h5>
+                            <div t-if="doc.follow_up_date">
+                                <strong>Follow-up Date: </strong><span t-field="doc.follow_up_date"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <div t-if="doc.notes" class="row mb-3">
+                    <div class="col-12">
+                        <h5>Additional Notes</h5>
+                        <div class="border p-3">
+                            <p t-field="doc.notes" style="white-space: pre-wrap;"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer with Signatures -->
+                <div class="row mt-5 mb-3">
+                    <div class="col-6 text-center">
+                        <div style="height: 60px;"></div>
+                        <div style="border-top: 2px solid black; width: 250px; margin: 0 auto;">
+                            <p class="mt-2"><strong>Visitor Signature</strong></p>
+                            <small>(<span t-field="doc.visitor_name"/>)</small>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div style="height: 60px;"></div>
+                        <div style="border-top: 2px solid black; width: 250px; margin: 0 auto;">
+                            <p class="mt-2"><strong>Company Representative</strong></p>
+                            <small>(<span t-field="doc.company_id.contact_person"/>)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="row mt-4">
+                    <div class="col-12 text-center text-muted">
+                        <hr/>
+                        <small>
+                            Report generated on: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')"/><br/>
+                            Visit Reference: <span t-field="doc.name"/>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_visit">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="contracted_companies_visits.report_visit_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>
